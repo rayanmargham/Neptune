@@ -1,0 +1,17 @@
+{
+    "files.associations": {
+        "random": "c",
+        "stddef.h": "c",
+        "memfunc.h": "c",
+        "idt.h": "c",
+        "flanterm.h": "c",
+        "fb.h": "c",
+        "gdt.h": "c",
+        "stdint.h": "c",
+        "varargs.h": "c",
+        "stdarg.h": "c",
+        "pmm.h": "c",
+        "host.h": "c",
+        "vmm.h": "c"
+    }
+}
