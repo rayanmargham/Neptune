@@ -10,4 +10,5 @@ int memcmp(const void *s1, const void *s2, size_t n);
 const char* to_hstring(uint64_t value);
 const char *to_string(uint64_t value);
 int strlen(const char *msg);
+int strncmp(const char* s1, const char* s2, size_t n);
 #endif

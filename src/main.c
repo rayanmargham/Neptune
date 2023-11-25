@@ -15,6 +15,7 @@
 #include "kheap.h"
 #include <lai/core.h>
 #include <lai/helpers/sci.h>
+#include "acpi.h"
 
 // we just tell limine to use the latest limine protocol or something, idk hard to understand 
 LIMINE_BASE_REVISION(1)
@@ -85,7 +86,6 @@ volatile void _start(void)
     *x = 5;
     kflantprint(ft_ctx, to_string(*x), 10, 0xFFFF00, "Kernel", 7, true);
     free(x);
-    lai_create_namespace();
-    lai_enable_acpi(0);
+    acpi_init();
     hcf();
 }

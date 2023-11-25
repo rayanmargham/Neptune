@@ -4,6 +4,7 @@
 #include "limine.h"
 #include "flanterm/flanterm.h"
 #include "flanterm/backends/fb.h"
+#include "kheap.h"
 extern struct flanterm_context *ft_ctx;
 extern void kflantprint(struct flanterm_context *ft_ctx, char msg[], size_t count, uint32_t color, char from_who[], size_t length_for_that, bool next_line);
 extern volatile struct limine_hhdm_request hhdm_request;
@@ -13,7 +14,26 @@ struct limine_kernel_address_request addr_request =
     .id = LIMINE_KERNEL_ADDRESS_REQUEST,
     .revision = 1
 };
+struct vmm_memory_region
+{
+    uint64_t base;
+    uint64_t length;
+    uint64_t flags;
+    struct vmm_memory_region *next;
+};
+struct vmm_memory_region *head;
+void vmm_alloc(int pages)
+{
+    if (!head)
+    {
+        head = malloc(sizeof(struct vmm_memory_region));
+        head->base = hhdm_request.response->offset;
+        for (int i = 0; i > pages; i++)
+        {
 
+        }
+    }
+}
 #define _SATURN_PRESENT_BITMASK 0x1
 #define _SATURN_READWRITE_BITMASK 0x2
 void update_cr3(uint64_t cr3_value)

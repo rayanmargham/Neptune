@@ -19,6 +19,9 @@ void Page_Fault(struct interrupt_frame* frame)
     flanterm_write(ft_ctx, to_hstring(cr2), 64);
     flanterm_write(ft_ctx, "\n", 2);
 
+    flanterm_write(ft_ctx, "RIP: ", 6);
+    flanterm_write(ft_ctx, to_hstring(frame->rip), 64);
+    flanterm_write(ft_ctx, "\n", 2);
     __asm__ ("cli");
     for (;;) {
         __asm__ ("hlt");
@@ -28,6 +31,9 @@ void g_p_fault(struct interrupt_frame *frame)
 {
     kflantprint(ft_ctx, "Yo MAMA so fat she GENERAL PROTECTED HERSELF!, Error Code: 0x", 62, 0xFF0000, "GP FAULT!", 10, false);
     flanterm_write(ft_ctx, to_hstring(frame->errorCode), 2);
+    flanterm_write(ft_ctx, "\n", 2);
+    flanterm_write(ft_ctx, "RIP: ", 6);
+    flanterm_write(ft_ctx, to_hstring(frame->rip), 64);
     flanterm_write(ft_ctx, "\n", 2);
     __asm__ ("cli");
     for (;;) {

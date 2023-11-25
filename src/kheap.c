@@ -59,7 +59,12 @@ void *malloc(size_t size)
         found_your_balls = &epic_gamer_slabs[i];
         break;
     }
-
+    if (found_your_balls == NULL)
+    {
+        flanterm_write(ft_ctx, "No Slab Can fit Size: ", 23);
+        flanterm_write(ft_ctx, to_hstring(size), 64);
+        flanterm_write(ft_ctx, "\n", 2);
+    }
     if (!found_your_balls->head)
     {
         slab_init(found_your_balls->size, found_your_balls);
@@ -77,7 +82,16 @@ void *malloc(size_t size)
 
 void *realloc(void *old_guy, size_t new_size)
 {
-    struct slab_header *page = (((uint64_t)old_guy) & ~0xfffUL);
+    if (!old_guy)
+    {
+        return malloc(new_size);
+    }
+    if ((uint64_t)old_guy & 0xFFFULL)
+    {
+        flanterm_write(ft_ctx, "THIS GUY IS A PAGE, NOT A SLAB GRRR", 36);
+        flanterm_write(ft_ctx, "\n", 2);
+    }
+    struct slab_header *page = (((uint64_t)old_guy) & ~0xFFFULL);
     struct slab *slab = page->slab;
     if (new_size <= slab->size)
     {
@@ -97,7 +111,7 @@ void *realloc(void *old_guy, size_t new_size)
 }
 void free(void *uhoh)
 {
-    struct slab_header *page = (((uint64_t)uhoh) & ~0xfffUL);
+    struct slab_header *page = (((uint64_t)uhoh) & ~0xFFFULL);
     struct slab *slab = page->slab;
     struct slab_entry *inital = slab->head;
     struct slab_entry *ohoh = uhoh;
