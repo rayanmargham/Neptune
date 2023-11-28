@@ -23,34 +23,29 @@ void *scandatable(const char* signaturem, size_t index)
 {
     int makingsure = 0;
     int amount_of_entries = (xsdt->header.length - sizeof(acpi_header_t)) / sizeof(uint64_t);
-    flanterm_write(ft_ctx, "XSDT Header Length (in bytes): ", 32);
-    flanterm_write(ft_ctx, to_hstring(xsdt->header.length), 64);
-    flanterm_write(ft_ctx, "\n", 2);
-    flanterm_write(ft_ctx, "Entries of Table: ", 19);
-    flanterm_write(ft_ctx, to_hstring(amount_of_entries), 64);
-    flanterm_write(ft_ctx, "\n", 2);
     for (int i = 0; i < amount_of_entries; i++)
     {
         struct acpi_header_t *gamer_table = laihost_map(xsdt->tables[i], 0);
-        if (memcmp(signaturem, gamer_table->signature, 4) == 0 && makingsure == index)
+        if (!memcmp(signaturem, gamer_table->signature, 4))
         {
-            return gamer_table;
+            if (index == makingsure)
+            {
+                return gamer_table;
+            }
+            else
+            {
+                makingsure++;
+            }
         }
-        
     }
+    return NULL;
 }
 void *GetTable(const char* signature, size_t index)
 {
-    flanterm_write(ft_ctx, "Looking for Signature: ", 24);
-    flanterm_write(ft_ctx, signature, strlen(signature));
-    flanterm_write(ft_ctx, "\n", 2);
-    flanterm_write(ft_ctx, to_hstring((uint64_t)xsdt), 64);
-    flanterm_write(ft_ctx, "\n", 2);
-    if (signature == "DSDT")
+    if (!memcmp(signature, "DSDT", 4))
     {
-        flanterm_write(ft_ctx, "Getting DSDT...", 16);
-        flanterm_write(ft_ctx, "\n", 2);
         struct acpi_fadt_t *fadt_among_us = scandatable("FACP", 0);
+
         return laihost_map(fadt_among_us->x_dsdt, 0);
     }
     else
@@ -72,7 +67,7 @@ void acpi_init()
         lai_set_acpi_revision(xsdt->header.revision);
 
         lai_create_namespace();
-        flanterm_write(ft_ctx, "print something", 16);
+        kflantprint(ft_ctx, "ACPI Loaded!", 13, 0xFFC0CB, "ACPI", 5, true);
         
     }
     else

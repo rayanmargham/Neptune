@@ -6,4 +6,9 @@ extern void kflantprint(struct flanterm_context *ft_ctx, char msg[], size_t coun
 void kpanic(const char *msg)
 {
     kflantprint(ft_ctx, msg, strlen(msg), 0xFF0000, "ABORT", 6, true);
+
+    for (;;)
+    {
+        __asm__ volatile ("hlt");
+    }
 }

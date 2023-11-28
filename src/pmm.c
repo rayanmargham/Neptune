@@ -3,6 +3,7 @@
 #include "limine.h"
 #include "flanterm/flanterm.h"
 #include "flanterm/backends/fb.h"
+#include "vmm.h"
 extern struct flanterm_context *ft_ctx;
 extern void kflantprint(struct flanterm_context *ft_ctx, char msg[], size_t count, uint32_t color, char from_who[], size_t length_for_that, bool next_line);
 struct pmm_list_node
@@ -20,6 +21,7 @@ volatile struct limine_hhdm_request hhdm_request = {
     .id = LIMINE_HHDM_REQUEST,
     .revision = 1
 };
+uint64_t end_of_hhdm = 0;
 void pmm_init()
 {
     struct pmm_list_node *prev_node = NULL;
@@ -88,6 +90,9 @@ void pmm_init()
                     break;
         }
     }
+    end_of_hhdm = memmap_request.response->entries[memmap_request.response->entry_count - 1]->base + memmap_request.response->entries[memmap_request.response->entry_count - 1]->length;
+    end_of_hhdm = align_up(end_of_hhdm, 4096);
+    end_of_hhdm = hhdm_request.response->offset + end_of_hhdm;
     uint64_t count = 0;
     struct pmm_list_node *current = head;
     while (current != NULL)

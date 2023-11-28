@@ -4,6 +4,7 @@
 #include "limine.h"
 #include "flanterm/flanterm.h"
 #include "flanterm/backends/fb.h"
+#include "vmm.h"
 extern struct flanterm_context *ft_ctx;
 extern void kflantprint(struct flanterm_context *ft_ctx, char msg[], size_t count, uint32_t color, char from_who[], size_t length_for_that, bool next_line);
 extern volatile struct limine_hhdm_request hhdm_request;
@@ -52,7 +53,7 @@ void *malloc(size_t size)
     struct slab *found_your_balls = NULL;
     for (int i = 0; i < 8; i++)
     {
-        if (epic_gamer_slabs[i].size < size)
+        if (epic_gamer_slabs[i].size <= size)
         {
             continue;
         }
@@ -61,9 +62,8 @@ void *malloc(size_t size)
     }
     if (found_your_balls == NULL)
     {
-        flanterm_write(ft_ctx, "No Slab Can fit Size: ", 23);
-        flanterm_write(ft_ctx, to_hstring(size), 64);
-        flanterm_write(ft_ctx, "\n", 2);
+        uint64_t aligned = align_up(size, 4096);
+        return vmm_alloc(aligned / 4096);
     }
     if (!found_your_balls->head)
     {
@@ -86,7 +86,7 @@ void *realloc(void *old_guy, size_t new_size)
     {
         return malloc(new_size);
     }
-    if ((uint64_t)old_guy & 0xFFFULL)
+    if ((uint64_t)old_guy & ~0xFFFULL == (uint64_t)old_guy)
     {
         flanterm_write(ft_ctx, "THIS GUY IS A PAGE, NOT A SLAB GRRR", 36);
         flanterm_write(ft_ctx, "\n", 2);
@@ -111,6 +111,11 @@ void *realloc(void *old_guy, size_t new_size)
 }
 void free(void *uhoh)
 {
+    if ((uint64_t)uhoh & ~0xFFFULL == (uint64_t)uhoh)
+    {
+        vmm_free(uhoh);
+        return;
+    }
     struct slab_header *page = (((uint64_t)uhoh) & ~0xFFFULL);
     struct slab *slab = page->slab;
     struct slab_entry *inital = slab->head;

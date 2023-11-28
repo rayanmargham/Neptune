@@ -8,7 +8,7 @@ make -C limine
 mkdir -p iso_root
  
 # Copy the relevant files over.
-cp -v Neptune.elf limine.cfg limine/limine-bios.sys \
+cp -v Neptune.elf BG.jpg limine.cfg limine/limine-bios.sys \
       limine/limine-bios-cd.bin limine/limine-uefi-cd.bin iso_root/
  
 # Create the EFI boot tree and copy Limine's EFI executables over.
